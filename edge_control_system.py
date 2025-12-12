@@ -218,6 +218,7 @@ def main_control_loop():
     except Exception as e:
         print(f"\nAn error occurred: {e}")
 
+
     finally:
         # Clean up all devices
         pump.off()

@@ -1,41 +1,57 @@
 Timestamp,Sensor_Type,Sensor_Reading,Actuator_Action,Is_Critical,Cloud_Sync_ID
-2025-12-12 08:14:08,oisture,73.4%,System Initialized: Pump OFF,No,CS-5129
-2025-12-12 08:14:08,emp,28.3°C,System Initialized: Fan OFF,No,CS-2483
-2025-12-12 08:14:08,umidity,70.2%,System Initialized: Mister OFF,No,CS-5274
-2025-12-12 08:14:08,ight,20703 Lux,System Initialized: Light OFF,No,CS-2215
-2025-12-12 08:14:08,oil_Moisture,71.9%,Soil_Moisture: No Change,No,CS-7944
-2025-12-12 08:14:08,emperature,28.6°C,Temperature: No Change,No,CS-1608
-2025-12-12 08:14:08,umidity,69.4%,Humidity: No Change,No,CS-3915
-2025-12-12 08:14:08,ight_Intensity,21448 Lux,Light: No Change,No,CS-1301
-2025-12-12 08:14:13,oil_Moisture,69.3%,Soil_Moisture: No Change,No,CS-8290
-2025-12-12 08:14:13,emperature,28.7°C,Temperature: No Change,No,CS-1856
-2025-12-12 08:14:13,umidity,68.9%,Humidity: No Change,No,CS-2911
-2025-12-12 08:14:13,ight_Intensity,23234 Lux,Light: No Change,No,CS-2141
-2025-12-12 08:14:18,oil_Moisture,68.4%,Soil_Moisture: No Change,No,CS-1341
-2025-12-12 08:14:18,emperature,29.1°C,Temperature: No Change,No,CS-6749
-2025-12-12 08:14:18,umidity,68.8%,Humidity: No Change,No,CS-1989
-2025-12-12 08:14:18,ight_Intensity,25105 Lux,Light: No Change,No,CS-1279
-2025-12-12 08:14:23,oil_Moisture,69.2%,Soil_Moisture: No Change,No,CS-9462
-2025-12-12 08:14:23,emperature,29.4°C,Temperature: No Change,No,CS-1000
-2025-12-12 08:14:23,umidity,69.0%,Humidity: No Change,No,CS-4772
-2025-12-12 08:14:23,ight_Intensity,26124 Lux,Light: No Change,No,CS-4213
-2025-12-12 08:14:28,oil_Moisture,68.8%,Soil_Moisture: No Change,No,CS-7478
-2025-12-12 08:14:28,emperature,29.3°C,Temperature: No Change,No,CS-7037
-2025-12-12 08:14:28,umidity,69.5%,Humidity: No Change,No,CS-6496
-2025-12-12 08:14:28,ight_Intensity,25582 Lux,Light: No Change,No,CS-1678
-2025-12-12 08:14:33,oil_Moisture,68.8%,Soil_Moisture: No Change,No,CS-2030
-2025-12-12 08:14:33,emperature,29.8°C,Temperature: No Change,No,CS-9010
-2025-12-12 08:14:33,umidity,68.6%,Humidity: No Change,No,CS-8315
-2025-12-12 08:14:33,ight_Intensity,26444 Lux,Light: No Change,No,CS-4764
-2025-12-12 08:14:38,oil_Moisture,68.1%,Soil_Moisture: No Change,No,CS-8337
-2025-12-12 08:14:38,emperature,30.1°C,Temperature: No Change,No,CS-8426
-2025-12-12 08:14:38,umidity,68.2%,Humidity: No Change,No,CS-7046
-2025-12-12 08:14:38,ight_Intensity,25876 Lux,Light: No Change,No,CS-3591
-2025-12-12 08:14:43,oil_Moisture,67.8%,Soil_Moisture: No Change,No,CS-1877
-2025-12-12 08:14:43,emperature,30.2°C,Temperature: No Change,No,CS-6006
-2025-12-12 08:14:43,umidity,67.7%,Humidity: No Change,No,CS-8609
-2025-12-12 08:14:43,ight_Intensity,28017 Lux,Light: No Change,No,CS-2214
-2025-12-12 08:14:48,oil_Moisture,68.4%,Soil_Moisture: No Change,No,CS-9993
-2025-12-12 08:14:48,emperature,30.2°C,Temperature: No Change,No,CS-5348
-2025-12-12 08:14:48,umidity,67.6%,Humidity: No Change,No,CS-4041
-2025-12-12 08:14:48,ight_Intensity,30149 Lux,Shade Net ON,Yes,CS-6765
+2025-12-12 08:14:08,oisture,73.4%,System Initialized: Pump OFF,No,CS-8850
+2025-12-12 08:14:08,emp,28.3°C,System Initialized: Fan OFF,No,CS-8498
+2025-12-12 08:14:08,umidity,70.2%,System Initialized: Mister OFF,No,CS-4536
+2025-12-12 08:14:08,ight,20703 Lux,System Initialized: Light OFF,No,CS-3964
+2025-12-12 08:14:08,oil_Moisture,71.9%,Soil_Moisture: No Change,No,CS-9104
+2025-12-12 08:14:08,emperature,28.6°C,Temperature: No Change,No,CS-4814
+2025-12-12 08:14:08,umidity,69.4%,Humidity: No Change,No,CS-8878
+2025-12-12 08:14:08,ight_Intensity,21448 Lux,Light: No Change,No,CS-6445
+2025-12-12 08:14:13,oil_Moisture,69.3%,Soil_Moisture: No Change,No,CS-3706
+2025-12-12 08:14:13,emperature,28.7°C,Temperature: No Change,No,CS-5647
+2025-12-12 08:14:13,umidity,68.9%,Humidity: No Change,No,CS-1317
+2025-12-12 08:14:13,ight_Intensity,23234 Lux,Light: No Change,No,CS-6812
+2025-12-12 08:14:18,oil_Moisture,68.4%,Soil_Moisture: No Change,No,CS-1238
+2025-12-12 08:14:18,emperature,29.1°C,Temperature: No Change,No,CS-3611
+2025-12-12 08:14:18,umidity,68.8%,Humidity: No Change,No,CS-8417
+2025-12-12 08:14:18,ight_Intensity,25105 Lux,Light: No Change,No,CS-1093
+2025-12-12 08:14:23,oil_Moisture,69.2%,Soil_Moisture: No Change,No,CS-9308
+2025-12-12 08:14:23,emperature,29.4°C,Temperature: No Change,No,CS-7208
+2025-12-12 08:14:23,umidity,69.0%,Humidity: No Change,No,CS-8206
+2025-12-12 08:14:23,ight_Intensity,26124 Lux,Light: No Change,No,CS-1392
+2025-12-12 08:14:28,oil_Moisture,68.8%,Soil_Moisture: No Change,No,CS-1772
+2025-12-12 08:14:28,emperature,29.3°C,Temperature: No Change,No,CS-8974
+2025-12-12 08:14:28,umidity,69.5%,Humidity: No Change,No,CS-2334
+2025-12-12 08:14:28,ight_Intensity,25582 Lux,Light: No Change,No,CS-9151
+2025-12-12 08:14:33,oil_Moisture,68.8%,Soil_Moisture: No Change,No,CS-3886
+2025-12-12 08:14:33,emperature,29.8°C,Temperature: No Change,No,CS-3269
+2025-12-12 08:14:33,umidity,68.6%,Humidity: No Change,No,CS-2748
+2025-12-12 08:14:33,ight_Intensity,26444 Lux,Light: No Change,No,CS-7807
+2025-12-12 08:14:38,oil_Moisture,68.1%,Soil_Moisture: No Change,No,CS-6662
+2025-12-12 08:14:38,emperature,30.1°C,Temperature: No Change,No,CS-1854
+2025-12-12 08:14:38,umidity,68.2%,Humidity: No Change,No,CS-4842
+2025-12-12 08:14:38,ight_Intensity,25876 Lux,Light: No Change,No,CS-4669
+2025-12-12 08:14:43,oil_Moisture,67.8%,Soil_Moisture: No Change,No,CS-9009
+2025-12-12 08:14:43,emperature,30.2°C,Temperature: No Change,No,CS-7606
+2025-12-12 08:14:43,umidity,67.7%,Humidity: No Change,No,CS-3218
+2025-12-12 08:14:43,ight_Intensity,28017 Lux,Light: No Change,No,CS-1425
+2025-12-12 08:14:48,oil_Moisture,68.4%,Soil_Moisture: No Change,No,CS-2145
+2025-12-12 08:14:48,emperature,30.2°C,Temperature: No Change,No,CS-1238
+2025-12-12 08:14:48,umidity,67.6%,Humidity: No Change,No,CS-1113
+2025-12-12 08:14:48,ight_Intensity,30149 Lux,Shade Net ON,Yes,CS-9610
+2025-12-12 08:14:53,oil_Moisture,68.9%,Soil_Moisture: No Change,No,CS-8196
+2025-12-12 08:14:53,emperature,30.5°C,Temperature: No Change,No,CS-7208
+2025-12-12 08:14:53,umidity,68.0%,Humidity: No Change,No,CS-3530
+2025-12-12 08:14:53,ight_Intensity,30826 Lux,Light: No Change,No,CS-9982
+2025-12-12 08:14:58,oil_Moisture,68.3%,Soil_Moisture: No Change,No,CS-2303
+2025-12-12 08:14:58,emperature,31.0°C,Temperature: No Change,No,CS-1704
+2025-12-12 08:14:58,umidity,67.2%,Humidity: No Change,No,CS-4831
+2025-12-12 08:14:58,ight_Intensity,32400 Lux,Light: No Change,No,CS-3657
+2025-12-12 08:15:03,oil_Moisture,68.3%,Soil_Moisture: No Change,No,CS-1208
+2025-12-12 08:15:03,emperature,31.0°C,Temperature: No Change,No,CS-6949
+2025-12-12 08:15:03,umidity,66.6%,Humidity: No Change,No,CS-5866
+2025-12-12 08:15:03,ight_Intensity,32727 Lux,Light: No Change,No,CS-4693
+2025-12-12 08:15:08,oil_Moisture,68.6%,Soil_Moisture: No Change,No,CS-4787
+2025-12-12 08:15:08,emperature,31.3°C,Temperature: No Change,No,CS-5780
+2025-12-12 08:15:08,umidity,66.1%,Humidity: No Change,No,CS-5079
+2025-12-12 08:15:08,ight_Intensity,34120 Lux,Light: No Change,No,CS-4447

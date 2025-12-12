@@ -98,6 +98,5 @@ def read_local_buffer_and_sync():
     # os.remove(LOCAL_LOG_FILE) # Uncomment this line in the final product!
     print(f"\nCleanup: {LOCAL_LOG_FILE} ready for next cycle (file was NOT deleted in this demo).")
 
-
 if __name__ == "__main__":
     read_local_buffer_and_sync()

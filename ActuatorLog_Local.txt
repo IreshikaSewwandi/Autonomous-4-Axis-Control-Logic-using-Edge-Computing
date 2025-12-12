@@ -54,3 +54,19 @@
 [2025-12-12 08:15:08] Temperature: 31.3°C. Action: Temperature: No Change (OFF)
 [2025-12-12 08:15:08] Humidity: 66.1%. Action: Humidity: No Change (OFF)
 [2025-12-12 08:15:08] Light_Intensity: 34120 Lux. Action: Light: No Change (LED:OFF, Shade:ON)
+[2025-12-12 08:23:11] Moisture: 72.2%. Action: System Initialized: Pump OFF
+[2025-12-12 08:23:11] Temp: 28.1°C. Action: System Initialized: Fan OFF
+[2025-12-12 08:23:11] Humidity: 70.3%. Action: System Initialized: Mister OFF
+[2025-12-12 08:23:11] Light: 22310 Lux. Action: System Initialized: Light OFF
+[2025-12-12 08:23:11] Soil_Moisture: 70.3%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 08:23:11] Temperature: 28.0°C. Action: Temperature: No Change (OFF)
+[2025-12-12 08:23:11] Humidity: 70.4%. Action: Humidity: No Change (OFF)
+[2025-12-12 08:23:11] Light_Intensity: 22358 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 08:23:16] Soil_Moisture: 69.2%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 08:23:16] Temperature: 28.0°C. Action: Temperature: No Change (OFF)
+[2025-12-12 08:23:16] Humidity: 70.7%. Action: Humidity: No Change (OFF)
+[2025-12-12 08:23:16] Light_Intensity: 24697 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 08:23:21] Soil_Moisture: 68.5%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 08:23:21] Temperature: 28.2°C. Action: Temperature: No Change (OFF)
+[2025-12-12 08:23:21] Humidity: 70.1%. Action: Humidity: No Change (OFF)
+[2025-12-12 08:23:21] Light_Intensity: 24088 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
