@@ -70,3 +70,27 @@
 [2025-12-12 08:23:21] Temperature: 28.2°C. Action: Temperature: No Change (OFF)
 [2025-12-12 08:23:21] Humidity: 70.1%. Action: Humidity: No Change (OFF)
 [2025-12-12 08:23:21] Light_Intensity: 24088 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 10:03:56] Moisture: 73.9%. Action: System Initialized: Pump OFF
+[2025-12-12 10:03:56] Temp: 28.4°C. Action: System Initialized: Fan OFF
+[2025-12-12 10:03:56] Humidity: 69.7%. Action: System Initialized: Mister OFF
+[2025-12-12 10:03:56] Light: 19226 Lux. Action: System Initialized: Light OFF
+[2025-12-12 10:03:56] Soil_Moisture: 72.1%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 10:03:56] Temperature: 28.5°C. Action: Temperature: No Change (OFF)
+[2025-12-12 10:03:56] Humidity: 69.2%. Action: Humidity: No Change (OFF)
+[2025-12-12 10:03:56] Light_Intensity: 19802 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 10:04:01] Soil_Moisture: 69.7%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 10:04:01] Temperature: 28.5°C. Action: Temperature: No Change (OFF)
+[2025-12-12 10:04:01] Humidity: 69.3%. Action: Humidity: No Change (OFF)
+[2025-12-12 10:04:01] Light_Intensity: 21555 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 10:04:06] Soil_Moisture: 69.6%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 10:04:06] Temperature: 28.5°C. Action: Temperature: No Change (OFF)
+[2025-12-12 10:04:06] Humidity: 69.8%. Action: Humidity: No Change (OFF)
+[2025-12-12 10:04:06] Light_Intensity: 22983 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 10:04:11] Soil_Moisture: 69.1%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 10:04:11] Temperature: 28.8°C. Action: Temperature: No Change (OFF)
+[2025-12-12 10:04:11] Humidity: 69.8%. Action: Humidity: No Change (OFF)
+[2025-12-12 10:04:11] Light_Intensity: 22373 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
+[2025-12-12 10:04:16] Soil_Moisture: 68.8%. Action: Soil_Moisture: No Change (OFF)
+[2025-12-12 10:04:16] Temperature: 29.1°C. Action: Temperature: No Change (OFF)
+[2025-12-12 10:04:16] Humidity: 69.8%. Action: Humidity: No Change (OFF)
+[2025-12-12 10:04:16] Light_Intensity: 21629 Lux. Action: Light: No Change (LED:OFF, Shade:OFF)
