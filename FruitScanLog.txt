@@ -1,0 +1,9 @@
+2026-06-24 11:38:58 | Total Fruits=2 | Harvest Status=Ready to Harvest
+2026-06-24 11:39:34 | Total Fruits=3 | Harvest Status=Ready to Harvest
+2026-06-24 11:41:25 | Total Fruits=2 | Harvest Status=Ready to Harvest
+2026-06-24 11:42:01 | Total Fruits=3 | Harvest Status=Ready to Harvest
+2026-06-24 11:42:35 | Total Fruits=1 | Harvest Status=Not Ready (Green)
+2026-06-24 11:43:14 | Total Fruits=0 | Harvest Status=Ready to Harvest
+2026-06-24 11:43:50 | Total Fruits=0 | Harvest Status=Ready to Harvest
+2026-06-24 11:44:45 | Total Fruits=0 | Harvest Status=Ready to Harvest
+2026-06-24 11:46:29 | Total Fruits=2 | Harvest Status=Ready to Harvest
