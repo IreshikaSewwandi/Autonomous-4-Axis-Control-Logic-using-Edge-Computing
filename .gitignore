@@ -1,1 +1,5 @@
+.env
 serviceAccountKey.json
+__pycache__/
+*.pyc
+edge-venv/serviceAccountKey.json
