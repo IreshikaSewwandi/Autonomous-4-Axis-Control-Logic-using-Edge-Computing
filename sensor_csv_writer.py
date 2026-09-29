@@ -1,90 +1,320 @@
+
 import csv
 import json
-import ssl
+import math
 import os
+import time
 from datetime import datetime
+
 import paho.mqtt.client as mqtt
 
+
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
+# CSV output file
 CSV_FILE = "green_house/sensor_data.csv"
 
-# --- MQTT CONFIGURATION (same broker, ESP32's publish topic) --- #
-BROKER = "c0eacb6e24dd4984814b3e19f4daa7a4.s1.eu.hivemq.cloud"
-PORT = 8883
-USERNAME = "greenhouse_admin"
-PASSWORD = "Admin@123"
-SENSOR_RAW_TOPIC = "greenhouse/sensors/environment"   # ESP32 publishes here
+# Keep only the latest 1000 data rows
+MAX_ROWS = 1000
 
-CSV_HEADER = ["timestamp", "device", "temp", "humidity", "light", "soil_moisture", "soil_temp"]
+# Local Mosquitto broker running on the Edge device
+# If Mosquitto is installed on this same Orange Pi/PC, use 127.0.0.1
+LOCAL_BROKER = "127.0.0.1"
+LOCAL_PORT = 1883
 
-# ================= ENSURE CSV EXISTS WITH HEADER ================= #
+# Topic published by the hybrid ESP32 code
+SENSOR_TOPIC = "greenhouse/local/telemetry"
+
+CLIENT_ID = "greenhouse_csv_logger"
+
+
+CSV_HEADER = [
+    "timestamp",
+    "device",
+    "temp",
+    "humidity",
+    "light",
+    "soil_moisture",
+    "soil_temp"
+]
+
+
+# ============================================================
+# CREATE CSV FILE IF IT DOES NOT EXIST
+# ============================================================
+
 def ensure_csv():
-    os.makedirs(os.path.dirname(CSV_FILE), exist_ok=True)
-    if not os.path.exists(CSV_FILE):
-        with open(CSV_FILE, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(CSV_HEADER)
-        print(f"[INFO] Created new CSV file with header: {CSV_FILE}")
+    folder = os.path.dirname(CSV_FILE)
 
-# ================= MQTT CALLBACKS ================= #
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+
+    if not os.path.exists(CSV_FILE) or os.path.getsize(CSV_FILE) == 0:
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(CSV_HEADER)
+
+        print(f"[INFO] CSV file ready: {CSV_FILE}")
+
+
+# ============================================================
+# KEEP LATEST 1000 DATA ROWS
+# ============================================================
+
+def trim_csv():
+    try:
+        with open(CSV_FILE, "r", newline="", encoding="utf-8") as file:
+            rows = list(csv.reader(file))
+
+        if not rows:
+            ensure_csv()
+            return
+
+        header = rows[0]
+        data_rows = rows[1:]
+
+        if len(data_rows) > MAX_ROWS:
+            data_rows = data_rows[-MAX_ROWS:]
+
+            temp_file = CSV_FILE + ".tmp"
+
+            with open(
+                temp_file, "w", newline="", encoding="utf-8"
+            ) as file:
+                writer = csv.writer(file)
+                writer.writerow(header)
+                writer.writerows(data_rows)
+                file.flush()
+                os.fsync(file.fileno())
+
+            os.replace(temp_file, CSV_FILE)
+
+            print(f"[INFO] CSV trimmed to latest {MAX_ROWS} rows.")
+
+    except (OSError, csv.Error) as error:
+        print(f"[WARN] CSV trimming failed: {error}")
+
+
+# ============================================================
+# VALIDATE SENSOR VALUES
+# Missing, null, invalid or non-finite values become 0
+# ============================================================
+
+def get_sensor_value(data, field_name):
+    value = data.get(field_name)
+
+    if value is None or isinstance(value, bool):
+        print(
+            f"[WARN] Sensor field '{field_name}' is NULL or missing. "
+            "Defaulting to 0."
+        )
+        return 0
+
+    try:
+        number = float(value)
+
+        if not math.isfinite(number):
+            print(
+                f"[WARN] Sensor field '{field_name}' is not finite. "
+                "Defaulting to 0."
+            )
+            return 0
+
+        return number
+
+    except (ValueError, TypeError):
+        print(
+            f"[WARN] Invalid value for '{field_name}': {value!r}. "
+            "Defaulting to 0."
+        )
+        return 0
+
+
+# ============================================================
+# SAVE ONE SENSOR MESSAGE TO CSV
+# ============================================================
+
+def save_sensor_data(data):
+    device = data.get("device_id", "UNKNOWN")
+
+    # Match the JSON field names published by the hybrid ESP32
+    temp = get_sensor_value(data, "temperature_2")
+    soil_temp = get_sensor_value(data, "temperature_1")
+    humidity = get_sensor_value(data, "humidity")
+    light = get_sensor_value(data, "light_lux")
+    soil_moisture = get_sensor_value(data, "soil_moisture")
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    row = [
+        timestamp,
+        device,
+        temp,
+        humidity,
+        light,
+        soil_moisture,
+        soil_temp
+    ]
+
+    try:
+        with open(CSV_FILE, "a", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(row)
+            file.flush()
+            os.fsync(file.fileno())
+
+        print(f"[OK] Sensor data saved: {row}")
+
+        trim_csv()
+
+    except (OSError, csv.Error) as error:
+        print(f"[ERROR] Failed to write CSV: {error}")
+
+
+# ============================================================
+# MQTT CALLBACKS
+# ============================================================
+
 def on_connect(client, userdata, flags, rc):
-    print(f"[MQTT] Connected with result code {rc}")
-    client.subscribe(SENSOR_RAW_TOPIC)
-    print(f"[MQTT] Subscribed to '{SENSOR_RAW_TOPIC}'")
+    if rc == 0:
+        print("[MQTT] Connected to LOCAL Mosquitto broker.")
+        print(f"[MQTT] Subscribing to: {SENSOR_TOPIC}")
+
+        result, mid = client.subscribe(SENSOR_TOPIC, qos=1)
+
+        if result == mqtt.MQTT_ERR_SUCCESS:
+            print("[MQTT] Subscription request sent.")
+        else:
+            print(f"[ERROR] Subscribe request failed: {result}")
+
+    else:
+        print(f"[MQTT ERROR] Local broker connection failed. Code: {rc}")
+
+
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        print(
+            "[MQTT WARN] Local MQTT connection lost. "
+            "Paho will attempt to reconnect."
+        )
+    else:
+        print("[MQTT] Disconnected from local broker.")
+
 
 def on_message(client, userdata, msg):
     try:
-        data = json.loads(msg.payload.decode())
-    except Exception as e:
-        print(f"[ERROR] Could not parse message: {e}")
-        return
+        payload = msg.payload.decode("utf-8")
+        data = json.loads(payload)
 
-    device = data.get("device_id", "UNKNOWN")
+        if not isinstance(data, dict):
+            print("[ERROR] MQTT payload must be a JSON object.")
+            return
 
-    # If a sensor fails on the ESP32 side (e.g. DHT read error), the field
-    # arrives as None. We don't discard the whole row for that - we just
-    # default the broken field to 0 so the rest of the real data still
-    # reaches the CSV / mobile app.
-    temp = data.get("temperature_2")        # air temperature
-    soil_temp = data.get("temperature_1")   # soil temperature
-    humidity = data.get("humidity")
-    light = data.get("light_lux")
-    soil_moisture = data.get("soil_moisture")
+        print(f"[MQTT] Received message on {msg.topic}")
 
-    raw_values = {
-        "temp": temp, "soil_temp": soil_temp,
-        "humidity": humidity, "light": light, "soil_moisture": soil_moisture
-    }
-    failed_fields = [k for k, v in raw_values.items() if v is None]
-    if failed_fields:
-        print(f"[WARN] Sensor read failed for: {failed_fields} - defaulting to 0")
+        save_sensor_data(data)
 
-    temp = temp if temp is not None else 0
-    soil_temp = soil_temp if soil_temp is not None else 0
-    humidity = humidity if humidity is not None else 0
-    light = light if light is not None else 0
-    soil_moisture = soil_moisture if soil_moisture is not None else 0
+    except UnicodeDecodeError as error:
+        print(f"[ERROR] Message is not valid UTF-8: {error}")
 
-    timestamp = datetime.now().strftime("%Y-%m-%d | %H:%M")
+    except json.JSONDecodeError as error:
+        print(f"[ERROR] Invalid JSON received: {error}")
 
-    row = [timestamp, device, temp, humidity, light, soil_moisture, soil_temp]
+    except Exception as error:
+        print(f"[ERROR] Could not process MQTT message: {error}")
 
-    with open(CSV_FILE, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(row)
 
-    print(f"[OK] Row written to CSV: {row}")
+# ============================================================
+# CREATE MQTT CLIENT (Paho MQTT 1.x / 2.x COMPATIBILITY)
+# ============================================================
 
-# ================= MAIN ================= #
-if __name__ == "__main__":
-    ensure_csv()
+def create_mqtt_client():
+    try:
+        # Paho MQTT 2.x
+        client = mqtt.Client(
+            callback_api_version=mqtt.CallbackAPIVersion.VERSION1,
+            client_id=CLIENT_ID,
+            protocol=mqtt.MQTTv311
+        )
 
-    client = mqtt.Client()
-    client.username_pw_set(USERNAME, PASSWORD)
-    client.tls_set(cert_reqs=ssl.CERT_NONE)
-    client.tls_insecure_set(True)
+    except (AttributeError, TypeError):
+        # Older Paho MQTT versions
+        client = mqtt.Client(
+            client_id=CLIENT_ID,
+            protocol=mqtt.MQTTv311
+        )
+
     client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
     client.on_message = on_message
 
-    print("Connecting to Cloud Broker (CSV writer)...")
-    client.connect(BROKER, PORT, 60)
-    client.loop_forever()
+    # Retry reconnecting if the local broker temporarily disconnects
+    client.reconnect_delay_set(min_delay=1, max_delay=30)
+
+    return client
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+def main():
+    ensure_csv()
+
+    client = create_mqtt_client()
+
+    print("============================================")
+    print(" Smart Greenhouse - Local CSV Sensor Logger")
+    print("============================================")
+    print(f"[CONFIG] Broker: {LOCAL_BROKER}:{LOCAL_PORT}")
+    print(f"[CONFIG] Topic:  {SENSOR_TOPIC}")
+    print(f"[CONFIG] CSV:    {CSV_FILE}")
+    print("[INFO] Logging does not require Internet access.")
+    print("[INFO] Local Wi-Fi, Edge device and broker must remain ON.")
+    print("============================================")
+
+    while True:
+        try:
+            print(
+                f"[MQTT] Connecting to local broker "
+                f"{LOCAL_BROKER}:{LOCAL_PORT}..."
+            )
+
+            client.connect(
+                LOCAL_BROKER,
+                LOCAL_PORT,
+                keepalive=60
+            )
+
+            # Handles incoming messages and automatic reconnection
+            client.loop_forever(retry_first_connection=True)
+
+        except TypeError:
+            # Compatibility fallback for older Paho versions
+            try:
+                client.connect(
+                    LOCAL_BROKER,
+                    LOCAL_PORT,
+                    keepalive=60
+                )
+                client.loop_forever()
+
+            except Exception as error:
+                print(f"[ERROR] MQTT connection failed: {error}")
+
+        except KeyboardInterrupt:
+            print("\n[INFO] Logger stopped by user.")
+            break
+
+        except Exception as error:
+            print(f"[ERROR] MQTT logger error: {error}")
+            print("[INFO] Retrying in 5 seconds...")
+            time.sleep(5)
+
+    client.disconnect()
+
+
+if __name__ == "__main__":
+    main()
