@@ -10,3 +10,11 @@
 2026-06-24 | 10:13 | ESP32_GH_01 | Mode=AUTO | Temp=26.0 Fan=OFF | Hum=73.2 Mister=ON | Light=1192.1 Shade=ON LED=OFF | Soil=20.0 Pump=ON | soil_temp=29.6
 2026-06-24 | 10:13 | ESP32_GH_01 | Mode=AUTO | Temp=31.2 Fan=OFF | Hum=86.6 Mister=OFF | Light=254.4 Shade=ON LED=ON | Soil=36.0 Pump=ON | soil_temp=30.4
 2026-06-24 | 10:13 | ESP32_GH_01 | Mode=AUTO | Temp=31.9 Fan=OFF | Hum=81.2 Mister=OFF | Light=1250.4 Shade=ON LED=OFF | Soil=45.0 Pump=ON | soil_temp=30.0
+2026-06-24 | 10:13 | ESP32_GH_01 | Mode=AUTO | Temp=31.9 Fan=OFF | Hum=81.2 Mister=OFF | Light=1250.4 Shade=ON LED=OFF | Soil=45.0 Pump=OFF | soil_temp=30.0
+2026-07-02 | 12:28 | ESP32_GH_01 | Mode=AUTO | Temp=29.2 Fan=OFF | Hum=72.3 Mister=OFF | Light=289.6 Shade=OFF LED=ON | Soil=94.0 Pump=OFF | soil_temp=32.6
+2026-07-02 | 12:28 | ESP32_GH_01 | Mode=MANUAL | Temp=31.6 Fan=OFF | Hum=73.4 Mister=OFF | Light=1218.5 Shade=OFF LED=OFF | Soil=57.0 Pump=OFF | soil_temp=33.3
+2026-07-02 | 12:29 | ESP32_GH_01 | Mode=MANUAL | Temp=25.3 Fan=OFF | Hum=50.7 Mister=OFF | Light=1356.2 Shade=OFF LED=OFF | Soil=24.0 Pump=ON | soil_temp=31.5
+2026-07-02 | 12:33 | ESP32_GH_01 | Mode=AUTO | Temp=31.6 Fan=OFF | Hum=67.7 Mister=OFF | Light=366.5 Shade=OFF LED=ON | Soil=97.0 Pump=OFF | soil_temp=31.1
+2026-07-04 | 21:47 | ESP32_GH_01 | Mode=AUTO | Temp=0.0 Fan=OFF | Hum=97.3 Mister=OFF | Light=239.1667 Shade=OFF LED=ON | Soil=0.0 Pump=ON | soil_temp=27.1
+2026-09-29 13:26:45 | ESP32_GH_01 | Mode=AUTO | Temp=28.5 Fan=OFF | Hum=72.0 Mister=OFF | Light=25000.0 Shade=ON LED=OFF | Soil=45.0 Pump=OFF | soil_temp=27.2
+2026-09-29 13:29:30 | ESP32_GH_01 | Mode=AUTO | Temp=35.0 Fan=ON | Hum=40.0 Mister=ON | Light=5000.0 Shade=OFF LED=ON | Soil=20.0 Pump=OFF | soil_temp=34.0

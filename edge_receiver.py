@@ -1,4 +1,5 @@
 import csv
+import math
 import time
 import json
 import ssl
@@ -67,6 +68,26 @@ if not CLOUD_PASS:
     raise RuntimeError("CLOUD_PASS is missing from .env")
 
 # ============================================================
+# SENSOR / VALUE HELPERS (null-safe)
+# ============================================================
+
+def read_value(data, key):
+    """float return karanawa. Missing / null / invalid nam None."""
+    v = data.get(key)
+    if v is None or isinstance(v, bool):
+        return None
+    try:
+        f = float(v)
+        return f if math.isfinite(f) else None
+    except (TypeError, ValueError):
+        return None
+
+
+def show(v, unit=""):
+    return "N/A" if v is None else f"{v}{unit}"
+
+
+# ============================================================
 # FIRESTORE SETUP
 # ============================================================
 
@@ -77,23 +98,25 @@ db = firestore.Client.from_service_account_json(
 print("[FIRESTORE] Connected to Firestore project.")
 
 # ============================================================
-# DEFAULT THRESHOLDS
+# TARGETS (set by Admin in the mobile app -> Firestore)
+# Defaults are used only until the first Firestore snapshot arrives.
 # ============================================================
 
-SOIL_START = 40.0
-SOIL_STOP  = 65.0
+TARGET_TEMP      = 30.0      # Air Temp      -> Fan
+TARGET_HUMID     = 75.0      # Humidity      -> Mister
+TARGET_MOIST     = 60.0      # Soil Moisture -> Pump
+TARGET_LIGHT     = 10000.0   # Light         -> LED / Shade
+TARGET_SOIL_TEMP = 25.0      # Soil Temp     -> Pump safety gate (max)
 
-TEMP_START = 32.0
-TEMP_STOP  = 28.0
+# Small "dead-band" so actuators do not flicker ON/OFF every 5 s
+# when a reading hovers exactly around the target. Set to 0 for exact switching.
+TEMP_BAND      = 1.0     # deg C
+HUM_BAND       = 2.0     # %
+MOIST_BAND     = 3.0     # %
+LIGHT_BAND_PCT = 0.05    # 5 % of target light
 
-HUM_START = 60.0
-HUM_STOP  = 80.0
-
-SHADE_ON  = 500.0
-SHADE_OFF = 200.0
-
-LED_ON  = 800.0
-LED_OFF = 1000.0
+# Pump is blocked while soil temp is ABOVE the admin's Soil Temp target
+USE_SOIL_TEMP_GATE = True
 
 # ============================================================
 # FIRESTORE CONFIGURATION LISTENER
@@ -101,60 +124,39 @@ LED_OFF = 1000.0
 
 def fetch_admin_config():
 
-    global SOIL_START, SOIL_STOP
-    global TEMP_START, TEMP_STOP
-    global HUM_START, HUM_STOP
-    global SHADE_ON, SHADE_OFF
-    global LED_ON, LED_OFF
-
     doc_ref = db.collection("configuration").document("settings")
 
     def on_snapshot(doc_snapshot, changes, read_time):
 
-        global SOIL_START, SOIL_STOP
-        global TEMP_START, TEMP_STOP
-        global HUM_START, HUM_STOP
-        global SHADE_ON, SHADE_OFF
-        global LED_ON, LED_OFF
+        global TARGET_TEMP, TARGET_HUMID, TARGET_MOIST
+        global TARGET_LIGHT, TARGET_SOIL_TEMP
 
         for doc in doc_snapshot:
 
             if not doc.exists:
                 continue
 
-            data = doc.to_dict()
+            data = doc.to_dict() or {}
 
-            t = data.get("targetTemp")
-            h = data.get("targetHumid")
-            m = data.get("targetMoist")
-            l = data.get("targetLight")
+            t  = read_value(data, "targetTemp")
+            h  = read_value(data, "targetHumid")
+            m  = read_value(data, "targetMoist")
+            l  = read_value(data, "targetLight")
+            st = read_value(data, "targetSoilTemp")
 
-            if t is not None:
-                TEMP_START = float(t)
-                TEMP_STOP = float(t) - 4.0
-
-            if h is not None:
-                HUM_START = float(h) - 10.0
-                HUM_STOP = float(h) + 10.0
-
-            if m is not None:
-                SOIL_START = float(m)
-                SOIL_STOP = float(m) + 25.0
-
-            if l is not None:
-                SHADE_ON = float(l) + 200.0
-                SHADE_OFF = float(l)
-
-                LED_ON = float(l) - 300.0
-                LED_OFF = float(l)
+            if t  is not None: TARGET_TEMP      = t
+            if h  is not None: TARGET_HUMID     = h
+            if m  is not None: TARGET_MOIST     = m
+            if l  is not None: TARGET_LIGHT     = l
+            if st is not None: TARGET_SOIL_TEMP = st
 
             print(
                 f"[FIRESTORE] Admin config updated -> "
-                f"TEMP={TEMP_START}/{TEMP_STOP} "
-                f"HUM={HUM_START}/{HUM_STOP} "
-                f"SOIL={SOIL_START}/{SOIL_STOP} "
-                f"SHADE={SHADE_ON}/{SHADE_OFF} "
-                f"LED={LED_ON}/{LED_OFF}"
+                f"AIR_TEMP={TARGET_TEMP} "
+                f"HUMIDITY={TARGET_HUMID} "
+                f"SOIL_MOISTURE={TARGET_MOIST} "
+                f"LIGHT={TARGET_LIGHT} "
+                f"SOIL_TEMP={TARGET_SOIL_TEMP}"
             )
 
     doc_ref.on_snapshot(on_snapshot)
@@ -274,6 +276,7 @@ def local_on_message(
         print(
             f"[LOCAL MQTT] Telemetry received | "
             f"Temp={data.get('temperature_2')}°C | "
+            f"SoilTemp={data.get('temperature_1')}°C | "
             f"Humidity={data.get('humidity')}% | "
             f"Soil={data.get('soil_moisture')}% | "
             f"Light={data.get('light_lux')} Lux"
@@ -682,7 +685,8 @@ def publish_telemetry(payload_dict):
 
         print(
             f"[CLOUD MQTT] Telemetry publish failed: {e}"
-        )        
+        )
+
 # ============================================================
 # MAIN CONTROL LOOP
 # ============================================================
@@ -728,54 +732,19 @@ while True:
     # SENSOR VALUES
     # --------------------------------------------------------
 
-    try:
+    timestamp = data.get(
+        "timestamp",
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
 
-        timestamp = data.get(
-            "timestamp",
-            datetime.now().strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-        )
+    device = data.get("device_id", "UNKNOWN")
 
-        device = data.get(
-            "device_id",
-            "UNKNOWN"
-        )
+    temp      = read_value(data, "temperature_2")   # air temp
+    hum       = read_value(data, "humidity")
+    light     = read_value(data, "light_lux")
+    soil      = read_value(data, "soil_moisture")
+    soil_temp = read_value(data, "temperature_1")   # soil temp
 
-        temp = float(
-            data["temperature_2"]
-        )
-
-        hum = float(
-            data["humidity"]
-        )
-
-        light = float(
-            data["light_lux"]
-        )
-
-        soil = float(
-            data["soil_moisture"]
-        )
-
-        soil_temp = float(
-            data["temperature_1"]
-        )
-
-    except (
-        KeyError,
-        TypeError,
-        ValueError
-    ) as e:
-
-        print(
-            f"[WARN] Invalid MQTT telemetry, "
-            f"skipping: {e}"
-        )
-
-        time.sleep(5)
-
-        continue
     # --------------------------------------------------------
     # CHECK SENSOR DATA FRESHNESS
     # --------------------------------------------------------
@@ -822,50 +791,55 @@ while True:
 
     if mode == "AUTO":
 
-        # Pump
-        if soil < SOIL_START:
-
-            pump = "ON"
-
-        elif soil > SOIL_STOP:
-
-            pump = "OFF"
-
-        # Fan
-        if temp > TEMP_START:
-
+        # Fan  : Air Temp  > target -> ON
+        if temp is None:
+            fan = "OFF"
+        elif temp > TARGET_TEMP:
             fan = "ON"
-
-        elif temp < TEMP_STOP:
-
+        elif temp < TARGET_TEMP - TEMP_BAND:
             fan = "OFF"
 
-        # Mister
-        if hum < HUM_START:
-
+        # Mister : Humidity < target -> ON
+        if hum is None:
+            mister = "OFF"
+        elif hum < TARGET_HUMID:
             mister = "ON"
-
-        elif hum > HUM_STOP:
-
+        elif hum > TARGET_HUMID + HUM_BAND:
             mister = "OFF"
 
-        # Shade
-        if light > SHADE_ON:
+        # Pump : Soil Moisture < target -> ON
+        #        (blocked while Soil Temp is above its target)
+        soil_temp_hot = (
+            USE_SOIL_TEMP_GATE
+            and soil_temp is not None
+            and soil_temp > TARGET_SOIL_TEMP
+        )
 
-            shade = "ON"
+        if soil is None or soil_temp_hot:
+            pump = "OFF"
+        elif soil < TARGET_MOIST:
+            pump = "ON"
+        elif soil > TARGET_MOIST + MOIST_BAND:
+            pump = "OFF"
 
-        elif light < SHADE_OFF:
-
-            shade = "OFF"
-
-        # LED
-        if light < LED_ON:
-
-            led = "ON"
-
-        elif light > LED_OFF:
-
+        # LED + Shade : Light vs target
+        #   LED   ON  : light < target        OFF : light > target + band
+        #   Shade ON  : light > target + band OFF : light < target
+        if light is None:
             led = "OFF"
+            shade = "OFF"
+        else:
+            light_band = TARGET_LIGHT * LIGHT_BAND_PCT
+
+            if light < TARGET_LIGHT:
+                led = "ON"
+            elif light > TARGET_LIGHT + light_band:
+                led = "OFF"
+
+            if light > TARGET_LIGHT + light_band:
+                shade = "ON"
+            elif light < TARGET_LIGHT:
+                shade = "OFF"
 
         actions = {
             "pump": pump,
@@ -896,30 +870,12 @@ while True:
     # --------------------------------------------------------
     # DISPLAY
     # --------------------------------------------------------
-    print(
-        f"Air Temp : {temp}°C "
-        f"→ Fan: {fan} "
-        f"(Target: {TEMP_START}°C)"
-    )
+    print(f"Air Temp : {show(temp, '°C')} → Fan: {fan} (Target: {TARGET_TEMP}°C)")
+    print(f"Soil Temp: {show(soil_temp, '°C')} (Pump allowed up to: {TARGET_SOIL_TEMP}°C)")
+    print(f"Humidity : {show(hum, '%')} → Mister: {mister} (Target: {TARGET_HUMID}%)")
+    print(f"Light    : {show(light, ' Lux')} → Shade: {shade} | LED: {led} (Target: {TARGET_LIGHT} Lux)")
+    print(f"Soil     : {show(soil, '%')} → Pump: {pump} (Target: {TARGET_MOIST}%)")
 
-    print(
-        f"Soil Temp: {soil_temp}°C"
-    )
-
-    print(
-        f"Humidity : {hum}% "
-        f"→ Mister: {mister}"
-    )
-
-    print(
-        f"Light    : {light} Lux "
-        f"→ Shade: {shade} | LED: {led}"
-    )
-
-    print(
-        f"Soil     : {soil}% "
-        f"→ Pump: {pump}"
-    )
     # --------------------------------------------------------
     # SEND CONTROL
     # --------------------------------------------------------
